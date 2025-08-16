@@ -1,0 +1,11 @@
+{
+  "appName": {
+    "message": "Chi mi ha cancellato?"
+  },
+  "appDesc": {
+    "message": "Questa estensione invia notifiche ogni volta che qualcuno ti rimuove dalla sua lista di amici."
+  },
+  "mess": {
+    "message": "Ciao, l'estensione è stata configurata con successo. Riceverai notifiche ogni volta che qualcuno ti rimuove da Facebook."
+  }
+}

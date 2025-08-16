@@ -1,0 +1,11 @@
+{
+  "appName": {
+    "message": "¿Quién me eliminó?"
+  },
+  "appDesc": {
+    "message": "Esta extensión envía notificaciones cada vez que alguien te elimina de su lista de amigos."
+  },
+  "mess": {
+    "message": "Hola, la extensión se ha configurado correctamente. Recibirás notificaciones cada vez que alguien te elimine de Facebook."
+  }
+}

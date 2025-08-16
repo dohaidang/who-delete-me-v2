@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Who Deleted Me?</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <img id="user-avatar" src="./icons/ic_48.png" alt="User Avatar" class="avatar" onerror="this.src='./icons/ic_48.png'">
+            <div class="user-info">
+                <h2 id="username">Loading...</h2>
+                <span id="user-status" class="status">Checking for changes...</span>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-item" title="Số bạn bè API có thể phát hiện (~95% tổng số). Số Facebook bao gồm cả profile ẩn, trang và tài khoản bị vô hiệu hóa.">
+                <span class="stat-number" id="total-friends">0</span>
+                <span class="stat-label">Có thể thấy</span>
+            </div>
+            <div class="stat-item added">
+                <span class="stat-number" id="added-count">0</span>
+                <span class="stat-label">Đã thêm (tổng)</span>
+            </div>
+            <div class="stat-item deleted">
+                <span class="stat-number" id="deleted-count">0</span>
+                <span class="stat-label">Đã xóa (tổng)</span>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="changes">Thay đổi gần đây</button>
+            <button class="tab-btn" data-tab="history">Lịch sử</button>
+        </div>
+
+        <!-- Changes Tab -->
+        <div id="changes-tab" class="tab-content active">
+            <div id="no-changes" class="no-data">
+                <img src="./icons/ic_96.png" alt="No Changes" class="no-data-icon">
+                <p>Chưa phát hiện thay đổi nào</p>
+                <small>Chúng tôi sẽ thông báo khi có người thêm hoặc xóa bạn</small>
+            </div>
+            
+            <div id="changes-list" class="changes-list" style="display: none;">
+                <!-- Added friends -->
+                <div id="added-section" class="section" style="display: none;">
+                    <h3 class="section-title added">👋 Vừa thêm bạn</h3>
+                    <div id="added-list" class="friend-list"></div>
+                </div>
+                
+                <!-- Deleted friends -->
+                <div id="deleted-section" class="section" style="display: none;">
+                    <h3 class="section-title deleted">💔 Vừa xóa bạn</h3>
+                    <div id="deleted-list" class="friend-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="history-tab" class="tab-content">
+            <div id="no-history" class="no-data">
+                <img src="./icons/ic_96.png" alt="No History" class="no-data-icon">
+                <p>Chưa có lịch sử</p>
+                <small>Lịch sử sẽ xuất hiện khi phát hiện thay đổi</small>
+            </div>
+            
+            <div id="history-list" class="history-list" style="display: none;">
+                <!-- History items will be added here -->
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+            <button id="refresh-btn" class="btn primary">🔄 Quét sâu</button>
+            <button id="clear-btn" class="btn secondary">🗑️ Xóa lịch sử</button>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <small>Kiểm tra lần cuối: <span id="last-check">Chưa bao giờ</span></small>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

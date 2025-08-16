@@ -1,0 +1,11 @@
+{
+  "appName": {
+    "message": "Wer hat mich gelöscht?"
+  },
+  "appDesc": {
+    "message": "Diese Erweiterung sendet Benachrichtigungen, wenn jemand Sie aus seiner Freundesliste entfernt."
+  },
+  "mess": {
+    "message": "Hallo, die Erweiterung wurde erfolgreich konfiguriert. Sie erhalten Benachrichtigungen, wenn Sie jemand von Facebook entfernt."
+  }
+}

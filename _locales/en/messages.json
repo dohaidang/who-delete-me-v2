@@ -1,0 +1,11 @@
+{
+  "appName": {
+    "message": "Who deleted me v1?"
+  },
+  "appDesc": {
+    "message": "This extension sends notifications everytime you get unfriended from Facebook."
+  },
+  "mess": {
+    "message": " Hello, you are set up. You will get notifications when someone deletes you from Facebook."
+  }
+}

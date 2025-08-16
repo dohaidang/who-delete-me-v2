@@ -1,0 +1,40 @@
+{
+	"update_url": "https://clients2.google.com/service/update2/crx",
+	"description": "__MSG_appDesc__",
+	"version": "1",
+	"name": "__MSG_appName__",
+	"default_locale": "en",
+	"manifest_version": 3,
+	"action": {
+		"default_title": "__MSG_appName__",
+		"default_popup": "popup.html",
+		"default_icon": {
+			"16": "./icons/ic_32.png",
+			"32": "./icons/ic_32.png",
+			"48": "./icons/ic_48.png",
+			"128": "./icons/ic_128.png"
+		}
+	},
+	"icons": {
+		"32": "./icons/ic_32.png",
+		"48": "./icons/ic_48.png",
+		"96": "./icons/ic_96.png",
+		"128": "./icons/ic_128.png"
+	},
+	"background": {
+		"service_worker": "background-wrapper.js"
+	},
+	"content_security_policy": {
+		"extension_pages": "script-src 'self'; object-src 'self'"
+	},
+	"permissions": [
+		"alarms",
+		"cookies",
+		"storage",
+		"notifications",
+		"tabs"
+	],
+	"host_permissions": [
+		"https://*.facebook.com/*"
+	]
+}

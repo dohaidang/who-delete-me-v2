@@ -1,0 +1,11 @@
+{
+  "appName": {
+    "message": "Qui m'a supprimé ?"
+  },
+  "appDesc": {
+    "message": "Cette extension vous envoie des notifications à chaque fois un amis vous supprime de sa liste d'amis"
+  },
+  "mess": {
+    "message": " Bonjour, l'extension a été configurée avec succes. Vous receverez des notification à chaque fois un ami vous supprime de Facebook."
+  }
+}
