@@ -209,7 +209,7 @@ async function loadUserData() {
         
         // Get history data to calculate total stats
         const historyResponse = await chrome.runtime.sendMessage({ action: 'getHistory' });
-        const historyData = historyResponse && historyResponse.history ? historyResponse.history : { list: [] };
+        const historyData = historyResponse?.history || { list: [] };
         
         console.log('📜 History data received:', historyData);
         console.log('📜 History count - Added:', historyData.list?.filter(item => item.reason === 'ADDED').length || 0);
@@ -300,13 +300,11 @@ function updateUserInfo(payload) {
     // Try to get user name from different sources
     if (payload.name && payload.name !== '' && payload.name !== 'undefined' && payload.name !== 'Người dùng') {
         userName = payload.name;
-    } else {
+    } else if (payload.uid) {
         // Try to get from UID if available
-        if (payload.uid) {
-            userName = `User ${payload.uid}`;
-            // Try to fetch name asynchronously
-            fetchUserNameAsync(payload.uid);
-        }
+        userName = `User ${payload.uid}`;
+        // Try to fetch name asynchronously
+        fetchUserNameAsync(payload.uid);
     }
     
     username.textContent = userName;
@@ -367,7 +365,7 @@ async function fetchUserNameAsync(uid) {
             uid: uid 
         });
         
-        if (response && response.name && response.name !== 'Người dùng') {
+        if (response?.name && response.name !== 'Người dùng') {
             username.textContent = response.name;
             console.log('✅ Updated username asynchronously:', response.name);
         }
@@ -381,7 +379,7 @@ function updateStats(data) {
     console.log('📊 Updating stats with data:', data);
     const { payload, pending, history } = data;
     
-    if (payload && payload.friends) {
+    if (payload?.friends) {
         const detectedCount = Object.keys(payload.friends).length;
         totalFriends.textContent = detectedCount;
         
@@ -400,7 +398,7 @@ function updateStats(data) {
     let totalDeleted = 0;
     
     // Count from history
-    if (history && history.list) {
+    if (history?.list) {
         totalAdded = history.list.filter(item => item.reason === 'ADDED').length;
         totalDeleted = history.list.filter(item => item.reason === 'DELETED').length;
     }
@@ -450,7 +448,7 @@ function updateChanges(pending) {
         addedListEl.innerHTML = '';
         
         pending.added.forEach(uid => {
-            const friend = pending.friendsTemp && pending.friendsTemp[uid];
+            const friend = pending.friendsTemp?.[uid];
             if (friend) {
                 addedListEl.appendChild(createFriendItem(friend, 'added', 'Vừa xảy ra'));
             }
@@ -533,7 +531,7 @@ function addMarkAsSeenButton() {
 async function updateHistoryFromStorage() {
     try {
         const response = await chrome.runtime.sendMessage({ action: 'getHistory' });
-        if (response && response.history) {
+        if (response?.history) {
             updateHistory(response.history);
         }
     } catch (error) {
