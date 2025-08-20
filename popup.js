@@ -1,30 +1,69 @@
 // DOM Elements
-const userAvatar = document.getElementById('user-avatar');
-const username = document.getElementById('username');
-const userStatus = document.getElementById('user-status');
-const totalFriends = document.getElementById('total-friends');
-const addedCount = document.getElementById('added-count');
-const deletedCount = document.getElementById('deleted-count');
-const lastCheck = document.getElementById('last-check');
+let userAvatar = document.getElementById('user-avatar');
+let username = document.getElementById('username');
+let userStatus = document.getElementById('user-status');
+let totalFriends = document.getElementById('total-friends');
+let addedCount = document.getElementById('added-count');
+let deletedCount = document.getElementById('deleted-count');
+let lastCheck = document.getElementById('last-check');
 
-const changesTab = document.getElementById('changes-tab');
-const historyTab = document.getElementById('history-tab');
-const noChanges = document.getElementById('no-changes');
-const changesList = document.getElementById('changes-list');
-const noHistory = document.getElementById('no-history');
-const historyList = document.getElementById('history-list');
+let changesTab = document.getElementById('changes-tab');
+let historyTab = document.getElementById('history-tab');
+let noChanges = document.getElementById('no-changes');
+let changesList = document.getElementById('changes-list');
+let noHistory = document.getElementById('no-history');
+let historyList = document.getElementById('history-list');
 
-const addedSection = document.getElementById('added-section');
-const deletedSection = document.getElementById('deleted-section');
-const addedListEl = document.getElementById('added-list');
-const deletedListEl = document.getElementById('deleted-list');
+let addedSection = document.getElementById('added-section');
+let deletedSection = document.getElementById('deleted-section');
+let addedListEl = document.getElementById('added-list');
+let deletedListEl = document.getElementById('deleted-list');
 
-const refreshBtn = document.getElementById('refresh-btn');
-const clearBtn = document.getElementById('clear-btn');
-const tabBtns = document.querySelectorAll('.tab-btn');
+let refreshBtn = document.getElementById('refresh-btn');
+let clearBtn = document.getElementById('clear-btn');
+let tabBtns = document.querySelectorAll('.tab-btn');
+
+// Re-initialize DOM elements (fallback)
+function reinitializeElements() {
+    console.log('🔄 Re-initializing DOM elements...');
+    
+    userAvatar = document.getElementById('user-avatar');
+    username = document.getElementById('username');
+    userStatus = document.getElementById('user-status');
+    totalFriends = document.getElementById('total-friends');
+    addedCount = document.getElementById('added-count');
+    deletedCount = document.getElementById('deleted-count');
+    lastCheck = document.getElementById('last-check');
+
+    changesTab = document.getElementById('changes-tab');
+    historyTab = document.getElementById('history-tab');
+    noChanges = document.getElementById('no-changes');
+    changesList = document.getElementById('changes-list');
+    noHistory = document.getElementById('no-history');
+    historyList = document.getElementById('history-list');
+
+    addedSection = document.getElementById('added-section');
+    deletedSection = document.getElementById('deleted-section');
+    addedListEl = document.getElementById('added-list');
+    deletedListEl = document.getElementById('deleted-list');
+
+    refreshBtn = document.getElementById('refresh-btn');
+    clearBtn = document.getElementById('clear-btn');
+    tabBtns = document.querySelectorAll('.tab-btn');
+    
+    console.log('🔄 Re-initialization completed');
+}
 
 // Check if all elements exist
 function checkElements() {
+    console.log('🔍 Checking DOM elements...');
+    
+    // Debug individual elements
+    console.log('userAvatar:', userAvatar, 'ID: user-avatar');
+    console.log('username:', username, 'ID: username');
+    console.log('userStatus:', userStatus, 'ID: user-status');
+    console.log('lastCheck:', lastCheck, 'ID: last-check');
+    
     const elements = {
         userAvatar, username, userStatus, totalFriends, addedCount, deletedCount, lastCheck,
         changesTab, historyTab, noChanges, changesList, noHistory, historyList,
@@ -35,11 +74,15 @@ function checkElements() {
     for (const [name, element] of Object.entries(elements)) {
         if (!element) {
             missing.push(name);
+            console.log(`❌ Missing element: ${name}`);
+        } else {
+            console.log(`✅ Found element: ${name}`);
         }
     }
     
     if (missing.length > 0) {
         console.error('❌ Missing DOM elements:', missing);
+        console.log('📄 Current HTML body:', document.body.innerHTML.substring(0, 500) + '...');
         return false;
     }
     
@@ -68,15 +111,114 @@ const getFacebookAvatar = (uid) => {
     return avatarUrls[0]; // Use first as primary
 };
 
+// Enhanced message sending with error handling
+const sendMessageToBackground = async (message, timeout = 5000) => {
+    try {
+        console.log('📡 Sending message to background:', message);
+        
+        // Check if runtime is available
+        if (!chrome.runtime || !chrome.runtime.sendMessage) {
+            throw new Error('Chrome runtime not available');
+        }
+        
+        return new Promise((resolve, reject) => {
+            const timeoutId = setTimeout(() => {
+                reject(new Error(`Message timeout after ${timeout}ms`));
+            }, timeout);
+            
+            chrome.runtime.sendMessage(message, (response) => {
+                clearTimeout(timeoutId);
+                
+                // Check for runtime errors
+                if (chrome.runtime.lastError) {
+                    console.error('❌ Runtime error:', chrome.runtime.lastError);
+                    reject(new Error(chrome.runtime.lastError.message));
+                    return;
+                }
+                
+                console.log('📡 Background response:', response);
+                resolve(response);
+            });
+        });
+    } catch (error) {
+        console.error('❌ Error sending message:', error);
+        throw error;
+    }
+};
+
+// Enhanced message listener setup
+const setupMessageListener = () => {
+    // Remove any existing listeners first
+    if (chrome.runtime.onMessage.hasListeners()) {
+        chrome.runtime.onMessage.removeListener(handleBackgroundMessage);
+    }
+    
+    // Add new listener
+    chrome.runtime.onMessage.addListener(handleBackgroundMessage);
+    console.log('📻 Message listener set up');
+};
+
+// Message handler
+const handleBackgroundMessage = (message, sender, sendResponse) => {
+    console.log('📻 Received message:', message);
+    
+    try {
+        if (message.action === 'ScanDone') {
+            console.log('✅ Scan completed signal received');
+            // Handle scan completion
+            return true; // Keep message channel open
+        }
+        
+        if (message.action === 'UpdateUI') {
+            console.log('🔄 UI update requested');
+            loadUserData();
+            return true;
+        }
+        
+        if (message.action === 'Error') {
+            console.error('❌ Background error:', message.error);
+            showError(message.error);
+            return true;
+        }
+    } catch (error) {
+        console.error('❌ Error handling message:', error);
+    }
+    
+    return false; // Close message channel
+};
+
 // Initialize popup
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Popup initialized, starting load...');
+    console.log('📄 Document ready state:', document.readyState);
+    console.log('📄 Document body exists:', !!document.body);
+    
+    // Set up message listener first
+    setupMessageListener();
+    
+    // Add small delay to ensure DOM is fully ready
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Try re-initializing elements first
+    reinitializeElements();
     
     // Check if all DOM elements exist first
     if (!checkElements()) {
         console.error('❌ DOM elements missing, cannot initialize');
-        if (userStatus) {
-            userStatus.textContent = 'Lỗi: Không tìm thấy thành phần giao diện';
+        
+        // Try to find basic elements manually
+        const basicCheck = {
+            'user-avatar': document.getElementById('user-avatar'),
+            'username': document.getElementById('username'),
+            'user-status': document.getElementById('user-status'),
+            'last-check': document.getElementById('last-check')
+        };
+        
+        console.log('🔍 Manual element check:', basicCheck);
+        
+        const statusEl = document.getElementById('user-status');
+        if (statusEl) {
+            statusEl.textContent = 'Lỗi: Không tìm thấy thành phần giao diện';
         }
         return;
     }
@@ -88,7 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('✅ Popup setup completed');
     } catch (error) {
         console.error('❌ Popup initialization failed:', error);
-        showError();
+        showError(error.message);
     }
 });
 
@@ -129,19 +271,25 @@ function setupEventListeners() {
         
         try {
             console.log('📡 Sending CheckNow message to background...');
-            const response = await chrome.runtime.sendMessage({ action: 'CheckNow' });
+            const response = await sendMessageToBackground({ action: 'CheckNow' });
             console.log('📡 Background response:', response);
 
-            // Wait for explicit ScanDone signal instead of timeout
-            await new Promise((resolve) => {
-                const timeoutId = setTimeout(resolve, 5000);
-                const handler = (msg) => {
+            // Wait for explicit ScanDone signal with enhanced listener
+            await new Promise((resolve, reject) => {
+                const timeoutId = setTimeout(() => {
+                    reject(new Error('Scan timeout after 30 seconds'));
+                }, 30000);
+                
+                const handler = (msg, sender, sendResponse) => {
                     if (msg && msg.action === 'ScanDone') {
                         clearTimeout(timeoutId);
                         chrome.runtime.onMessage.removeListener(handler);
                         resolve();
+                        return true;
                     }
+                    return false;
                 };
+                
                 chrome.runtime.onMessage.addListener(handler);
             });
 
@@ -151,7 +299,7 @@ function setupEventListeners() {
             console.log('✅ Deep scan completed successfully');
         } catch (error) {
             console.error('❌ Error during deep scan:', error);
-            userStatus.textContent = 'Lỗi khi quét. Vui lòng thử lại.';
+            userStatus.textContent = `Lỗi khi quét: ${error.message}`;
         } finally {
             refreshBtn.disabled = false;
             refreshBtn.innerHTML = '🔄 Quét sâu';
@@ -186,13 +334,13 @@ async function loadUserData() {
     try {
         // Get data from background script
         console.log('📡 Sending GetResults message...');
-        const response = await chrome.runtime.sendMessage({ action: 'GetResults' });
+        const response = await sendMessageToBackground({ action: 'GetResults' });
         
         console.log('📦 Full extension response:', response);
         
         if (!response) {
             console.log('❌ No response from background script');
-            showError();
+            showError('Không nhận được phản hồi từ background script');
             return;
         }
         
@@ -208,7 +356,7 @@ async function loadUserData() {
         console.log('📊 Pending changes:', response.pending);
         
         // Get history data to calculate total stats
-        const historyResponse = await chrome.runtime.sendMessage({ action: 'getHistory' });
+        const historyResponse = await sendMessageToBackground({ action: 'getHistory' });
         const historyData = historyResponse?.history || { list: [] };
         
         console.log('📜 History data received:', historyData);
@@ -282,11 +430,30 @@ async function refreshUserInfo() {
     }
 }
 
-// Show error message
-function showError() {
-    username.textContent = 'Lỗi';
-    userStatus.textContent = 'Không thể tải dữ liệu. Vui lòng thử lại.';
-    userAvatar.src = './icons/ic_48.png';
+// Display error message to user
+function showError(message = 'Không thể tải dữ liệu. Vui lòng thử lại.') {
+    console.error('🚨 Showing error:', message);
+    
+    if (username) {
+        username.textContent = 'Lỗi';
+    }
+    
+    if (userStatus) {
+        userStatus.textContent = `❌ ${message}`;
+        userStatus.style.color = '#e74c3c';
+    }
+    
+    if (userAvatar) {
+        userAvatar.src = './icons/ic_48.png';
+    }
+    
+    // Reset status after 5 seconds
+    setTimeout(() => {
+        if (userStatus) {
+            userStatus.textContent = 'Đang theo dõi thay đổi Facebook';
+            userStatus.style.color = '';
+        }
+    }, 5000);
 }
 
 // Update user info
@@ -360,7 +527,7 @@ function updateUserInfo(payload) {
 // Fetch user name asynchronously
 async function fetchUserNameAsync(uid) {
     try {
-        const response = await chrome.runtime.sendMessage({ 
+        const response = await sendMessageToBackground({ 
             action: 'getUserName', 
             uid: uid 
         });
@@ -510,7 +677,7 @@ function addMarkAsSeenButton() {
         markSeenBtn.innerHTML = '⏳ Đang chuyển vào lịch sử...';
         
         try {
-            await chrome.runtime.sendMessage({ action: 'UpdateResults' });
+            await sendMessageToBackground({ action: 'UpdateResults' });
             console.log('✅ Pending changes moved to history');
             await loadUserData(); // Reload to update UI
             userStatus.textContent = 'Đã chuyển vào lịch sử';
@@ -530,7 +697,7 @@ function addMarkAsSeenButton() {
 // Update history from storage
 async function updateHistoryFromStorage() {
     try {
-        const response = await chrome.runtime.sendMessage({ action: 'getHistory' });
+        const response = await sendMessageToBackground({ action: 'getHistory' });
         if (response?.history) {
             updateHistory(response.history);
         }
@@ -780,7 +947,7 @@ function showTab(tabName) {
 // Move pending changes to history
 async function movePendingToHistory() {
     try {
-        const response = await chrome.runtime.sendMessage({ action: 'UpdateResults' });
+        const response = await sendMessageToBackground({ action: 'UpdateResults' });
         if (response && response.response === 'UPDATED') {
             console.log('✅ Pending changes moved to history');
             // Reload data to reflect changes
