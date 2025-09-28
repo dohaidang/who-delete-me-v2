@@ -32,5 +32,6 @@
 
 *** Ghi chú quan trọng
 - Tiện ích này hoạt động bằng cách so sánh danh sách bạn bè của bạn tại các thời điểm khác nhau. Vì vậy, nếu ai đó đã hủy kết bạn trước khi bạn cài đặt tiện ích này, bạn sẽ không thể biết được.
-- Nếu bạn cần hỗ trợ, hãy để lại câu hỏi hoặc liên hệ với chúng tôi qua "family010203@gmail.com".
+- Nếu bạn cần hỗ trợ, hãy để lại câu hỏi hoặc liên hệ với tôi qua "family010203@gmail.com".
+
 
